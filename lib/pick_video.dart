@@ -7,11 +7,11 @@ import 'package:image_picker/image_picker.dart';
  */
 
 typedef void CallbackValue(dynamic value);
-class PickImage extends StatelessWidget {
+class PickVideo extends StatelessWidget {
   final CallbackValue callbackFile;
   final Color color;
 
-  PickImage({this.callbackFile, this.color});
+  PickVideo({this.callbackFile, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -94,14 +94,13 @@ class PickImage extends StatelessWidget {
   }
 
   Future getImage(bool isKamera) async {
-    var image = await ImagePicker.pickImage(
+    var image = await ImagePicker.pickVideo(
       source: isKamera ? ImageSource.camera : ImageSource.gallery,
-      maxWidth: 800.0,
-      maxHeight: 600.0,
     );
 
+    String url = "https://firebasestorage.googleapis.com/v0/b/tbbchat-d6f52.appspot.com/o/1601288130853?alt=media&token=4abe7d2d-066d-4519-8258-a1bff425dc32";
     if (image != null) {
-      callbackFile(image);
+      callbackFile(url);
     }
   }
 }

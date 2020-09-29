@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html_editor/local_server.dart';
 import 'package:html_editor/pick_image.dart';
+import 'package:html_editor/pick_video.dart';
 import 'package:path/path.dart' as p;
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -159,6 +160,11 @@ class HtmlEditorState extends State<HtmlEditor> {
                             ? bottomSheetPickImage(context)
                             : dialogPickImage(context);
                       }),
+                      widgetIcon(Icons.videocam, "Video", onKlik: () {
+                        widget.useBottomSheet
+                            ? bottomSheetPickVideo(context)
+                            : dialogPickImage(context);
+                      }),
                       widgetIcon(Icons.content_copy, "Copy", onKlik: () async {
                         String data = await getText();
                         Clipboard.setData(new ClipboardData(text: data));
@@ -300,7 +306,33 @@ class HtmlEditorState extends State<HtmlEditor> {
                     String base64Image =
                         "<img width=\"${widget.widthImage}\" src=\"data:image/png;base64, "
                         "${base64Encode(imageBytes)}\" data-filename=\"$filename\">";
-
+                    String txt =
+                        "\$('.note-editable').append( '" + base64Image + "');";
+                    _controller.evaluateJavascript(txt);
+                  }),
+            ),
+          );
+        });
+  }
+  dialogPickVideo(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            content: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              padding: const EdgeInsets.all(12),
+              height: 120,
+              child: PickImage(
+                  color: Colors.black45,
+                  callbackFile: (url) async {
+                    String base64Image = "<video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video>";
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);
@@ -337,4 +369,28 @@ class HtmlEditorState extends State<HtmlEditor> {
           });
         });
   }
+  bottomSheetPickVideo(context) {
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        backgroundColor: Colors.white,
+        context: context,
+        builder: (BuildContext bc) {
+          return StatefulBuilder(builder: (BuildContext context, setStatex) {
+            return SingleChildScrollView(
+                child: Container(
+                  height: 140,
+                  width: double.infinity,
+                  child: PickVideo(callbackFile: (url) async {
+                    String base64Image = "<video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video>";
+                    String txt =
+                        "\$('.note-editable').append( '" + base64Image + "');";
+                    _controller.evaluateJavascript(txt);
+                  }),
+                ));
+          });
+        });
+  }
+
 }
