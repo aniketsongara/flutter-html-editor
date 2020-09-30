@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-/*
- * Created by riyadi rb on 2/5/2020.
- * link  : https://github.com/xrb21/flutter-html-editor
- */
 
 typedef void CallbackValue(dynamic value);
 class PickImage extends StatelessWidget {
@@ -106,11 +102,3 @@ class PickImage extends StatelessWidget {
   }
 }
 
-
-
-/*
-               String base64Image = "<video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video>";
-                String txt =
-                    "\$('.note-editable').append( '" + base64Image + "');";
-                _controller.evaluateJavascript(txt);
-*/

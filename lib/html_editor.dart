@@ -13,6 +13,8 @@ import 'package:html_editor/pick_video.dart';
 import 'package:path/path.dart' as p;
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'audio.dart';
+
 /*
  * Created by riyadi rb on 2/5/2020.
  * link  : https://github.com/xrb21/flutter-html-editor
@@ -102,47 +104,6 @@ class HtmlEditorState extends State<HtmlEditor> {
           ),
       child: Column(
         children: <Widget>[
-          Expanded(
-            child: WebView(
-              key: _mapKey,
-              onWebResourceError: (e) {
-                print("error ${e.description}");
-              },
-              onWebViewCreated: (webViewController) {
-                _controller = webViewController;
-
-                if (Platform.isAndroid) {
-                  final filename =
-                      'packages/html_editor/summernote/summernote.html';
-                  _controller.loadUrl(
-                      "file:///android_asset/flutter_assets/" + filename);
-                } else {
-                  _loadHtmlFromAssets();
-                }
-              },
-              javascriptMode: JavascriptMode.unrestricted,
-              gestureNavigationEnabled: true,
-              gestureRecognizers: [
-                Factory(
-                    () => VerticalDragGestureRecognizer()..onUpdate = (_) {}),
-              ].toSet(),
-              javascriptChannels: <JavascriptChannel>[
-                getTextJavascriptChannel(context)
-              ].toSet(),
-              onPageFinished: (String url) {
-                if (widget.hint != null) {
-                  setHint(widget.hint);
-                } else {
-                  setHint("");
-                }
-
-                setFullContainer();
-                if (widget.value != null) {
-                  setText(widget.value);
-                }
-              },
-            ),
-          ),
           widget.showBottomToolbar
               ? Divider()
               : Container(
@@ -155,21 +116,31 @@ class HtmlEditorState extends State<HtmlEditor> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      widgetIcon(Icons.image, "Image", onKlik: () {
+                      widgetIcon(Icons.image, "", onKlik: () {
                         widget.useBottomSheet
                             ? bottomSheetPickImage(context)
                             : dialogPickImage(context);
                       }),
-                      widgetIcon(Icons.videocam, "Video", onKlik: () {
+                      widgetIcon(Icons.videocam, "", onKlik: () {
                         widget.useBottomSheet
                             ? bottomSheetPickVideo(context)
                             : dialogPickImage(context);
                       }),
-                      widgetIcon(Icons.content_copy, "Copy", onKlik: () async {
+                      widgetIcon(Icons.mic, "", onKlik: () {
+                        Navigator.push(context,MaterialPageRoute(builder: (context){
+                          return AudioRecordingScreen(callbackFile: (url) async {
+                            String base64Image = "<audio controls> <source src=\"$url\" type=\"audio/mp3\"></audio>";
+                            String txt =
+                                "\$('.note-editable').append( '" + base64Image + "');";
+                            _controller.evaluateJavascript(txt);
+                          });
+                        }));
+                      }),
+                      widgetIcon(Icons.content_copy, "C", onKlik: () async {
                         String data = await getText();
                         Clipboard.setData(new ClipboardData(text: data));
                       }),
-                      widgetIcon(Icons.content_paste, "Paste",
+                      widgetIcon(Icons.content_paste, "P",
                           onKlik: () async {
                         ClipboardData data =
                             await Clipboard.getData(Clipboard.kTextPlain);
@@ -192,7 +163,48 @@ class HtmlEditorState extends State<HtmlEditor> {
                 )
               : Container(
                   height: 1,
-                )
+                ),
+          Expanded(
+            child: WebView(
+              key: _mapKey,
+              onWebResourceError: (e) {
+                print("error ${e.description}");
+              },
+              onWebViewCreated: (webViewController) {
+                _controller = webViewController;
+
+                if (Platform.isAndroid) {
+                  final filename =
+                      'packages/html_editor/summernote/summernote.html';
+                  _controller.loadUrl(
+                      "file:///android_asset/flutter_assets/" + filename);
+                } else {
+                  _loadHtmlFromAssets();
+                }
+              },
+              javascriptMode: JavascriptMode.unrestricted,
+              gestureNavigationEnabled: true,
+              gestureRecognizers: [
+                Factory(
+                        () => VerticalDragGestureRecognizer()..onUpdate = (_) {}),
+              ].toSet(),
+              javascriptChannels: <JavascriptChannel>[
+                getTextJavascriptChannel(context)
+              ].toSet(),
+              onPageFinished: (String url) {
+                if (widget.hint != null) {
+                  setHint(widget.hint);
+                } else {
+                  setHint("");
+                }
+
+                setFullContainer();
+                if (widget.value != null) {
+                  setText(widget.value);
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -392,5 +404,8 @@ class HtmlEditorState extends State<HtmlEditor> {
           });
         });
   }
-
 }
+
+
+// String base64Image = "<audio controls> <source src=\"$url1\" type=\"audio/mp3\"></audio>";
+//

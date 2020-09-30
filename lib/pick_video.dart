@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 /*
@@ -98,10 +102,31 @@ class PickVideo extends StatelessWidget {
       source: isKamera ? ImageSource.camera : ImageSource.gallery,
     );
 
-    String url = "https://firebasestorage.googleapis.com/v0/b/tbbchat-d6f52.appspot.com/o/1601288130853?alt=media&token=4abe7d2d-066d-4519-8258-a1bff425dc32";
     if (image != null) {
-      callbackFile(url);
+      uploadVideoFile(image);
     }
+  }
+
+
+  Future uploadVideoFile(File image) async {
+    String videoUrl;
+    final DateTime now = DateTime.now();
+    final int millSeconds = now.millisecondsSinceEpoch;
+    final String storageId = (millSeconds.toString());
+
+    StorageReference ref = FirebaseStorage.instance.ref().child(storageId);
+    StorageUploadTask uploadTask =
+    ref.putFile(image, StorageMetadata(contentType: 'video/mp4'));
+    Fluttertoast.showToast(msg: 'Please wait.');
+    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+    storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
+      videoUrl = downloadUrl;
+      Fluttertoast.showToast(msg: videoUrl);
+      callbackFile(videoUrl);
+    }, onError: (err) {
+      Fluttertoast.showToast(msg: 'This file is not an video');
+    });
+
   }
 }
 
