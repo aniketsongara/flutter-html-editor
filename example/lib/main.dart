@@ -38,9 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
+      body:  SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -48,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 hint: "Your text here...",
                 //value: "text content initial, if any",
                 key: keyEditor,
-                height: 400,
+                height: displayHeight(context)* 0.70,
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -85,10 +83,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
-      ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
 
+}
+
+
+Size displaySize(BuildContext context) {
+  debugPrint('Size = ' + MediaQuery.of(context).size.toString());
+  return MediaQuery.of(context).size;
+}
+
+double displayHeight(BuildContext context) {
+  debugPrint('Height = ' + displaySize(context).height.toString());
+  return displaySize(context).height;
+}
+
+double displayWidth(BuildContext context) {
+  debugPrint('Width = ' + displaySize(context).width.toString());
+  return displaySize(context).width;
 }
