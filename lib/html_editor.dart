@@ -316,7 +316,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                     String filename = p.basename(file.path);
                     List<int> imageBytes = await file.readAsBytes();
                     String base64Image =
-                        "<p><br></p><img width=\"${widget.widthImage}\" src=\"data:image/png;base64, "
+                        "<p><br></p><p><br></p><img width=\"${widget.widthImage}\" src=\"data:image/png;base64, "
                         "${base64Encode(imageBytes)}\" data-filename=\"$filename\"><p><br></p>";
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
@@ -344,7 +344,7 @@ class HtmlEditorState extends State<HtmlEditor> {
               child: PickImage(
                   color: Colors.black45,
                   callbackFile: (url) async {
-                    String base64Image = "<p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p>";
+                    String base64Image = "<p><br></p><p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p>";
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);
@@ -370,7 +370,7 @@ class HtmlEditorState extends State<HtmlEditor> {
               child: PickImage(callbackFile: (file) async {
                 String filename = p.basename(file.path);
                 List<int> imageBytes = await file.readAsBytes();
-                String base64Image = "<p><br></p><img width=\"${widget.widthImage}\" "
+                String base64Image = "<p><br></p><p><br></p><img width=\"${widget.widthImage}\" "
                     "src=\"data:image/png;base64, "
                     "${base64Encode(imageBytes)}\" data-filename=\"$filename\"><p><br></p>";
                 String txt =
@@ -395,7 +395,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                   height: 140,
                   width: double.infinity,
                   child: PickVideo(callbackFile: (url) async {
-                    String base64Image = "<p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p>";
+                    String base64Image = "<p><br></p><p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p>";
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);
