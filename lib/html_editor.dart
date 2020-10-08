@@ -127,14 +127,9 @@ class HtmlEditorState extends State<HtmlEditor> {
                             : dialogPickImage(context);
                       }),
                       widgetIcon(Icons.mic, "", onKlik: () {
-                        Navigator.push(context,MaterialPageRoute(builder: (context){
-                          return AudioRecordingScreen(callbackFile: (url) async {
-                            String base64Image = "<audio controls> <source src=\"$url\" type=\"audio/mp3\"></audio>";
-                            String txt =
-                                "\$('.note-editable').append( '" + base64Image + "');";
-                            _controller.evaluateJavascript(txt);
-                          });
-                        }));
+                       widget.useBottomSheet
+                           ? bottomSheetPickAudio(context)
+                           : bottomSheetPickAudio(context);
                       }),
                       widgetIcon(Icons.content_copy, "C", onKlik: () async {
                         String data = await getText();
@@ -317,7 +312,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                     List<int> imageBytes = await file.readAsBytes();
                     String base64Image =
                         "<p><br></p><p><br></p><img width=\"${widget.widthImage}\" src=\"data:image/png;base64, "
-                        "${base64Encode(imageBytes)}\" data-filename=\"$filename\"><p><br></p>";
+                        "${base64Encode(imageBytes)}\" data-filename=\"$filename\"><p><br></p><p><br></p>";
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);
@@ -344,7 +339,7 @@ class HtmlEditorState extends State<HtmlEditor> {
               child: PickImage(
                   color: Colors.black45,
                   callbackFile: (url) async {
-                    String base64Image = "<p><br></p><p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p>";
+                    String base64Image = "<p><br></p><p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p><p><br></p>";
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);
@@ -372,7 +367,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                 List<int> imageBytes = await file.readAsBytes();
                 String base64Image = "<p><br></p><p><br></p><img width=\"${widget.widthImage}\" "
                     "src=\"data:image/png;base64, "
-                    "${base64Encode(imageBytes)}\" data-filename=\"$filename\"><p><br></p>";
+                    "${base64Encode(imageBytes)}\" data-filename=\"$filename\"><p><br></p><p><br></p>";
                 String txt =
                     "\$('.note-editable').append( '" + base64Image + "');";
                 _controller.evaluateJavascript(txt);
@@ -395,7 +390,30 @@ class HtmlEditorState extends State<HtmlEditor> {
                   height: 140,
                   width: double.infinity,
                   child: PickVideo(callbackFile: (url) async {
-                    String base64Image = "<p><br></p><p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p>";
+                    String base64Image = "<p><br></p><p><br></p><video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video><p><br></p><p><br></p>";
+                    String txt =
+                        "\$('.note-editable').append( '" + base64Image + "');";
+                    _controller.evaluateJavascript(txt);
+                  }),
+                ));
+          });
+        });
+  }
+  bottomSheetPickAudio(context) {
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        backgroundColor: Colors.white,
+        context: context,
+        builder: (BuildContext bc) {
+          return StatefulBuilder(builder: (BuildContext context, setStatex) {
+            return SingleChildScrollView(
+                child: Container(
+                  height: 140,
+                  width: double.infinity,
+                  child: AudioRecordingScreen(callbackFile: (url) async {
+                    String base64Image = "<p><br></p><p><br></p><audio controls> <source src=\"$url\" type=\"audio/mp3\"></audio><p><br></p><p><br></p>";
                     String txt =
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);

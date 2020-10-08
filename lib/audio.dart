@@ -3,10 +3,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:audio_recorder/audio_recorder.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
-
+import 'package:file_picker/file_picker.dart';
 
 typedef void CallbackValue(dynamic value);
 
@@ -85,7 +86,7 @@ class AudioRecordingState extends State<AudioRecordingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return /*Scaffold(
       //appBar: AppBar(title: Text('Reacord Audio'),),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -113,9 +114,133 @@ class AudioRecordingState extends State<AudioRecordingScreen> {
           Text(_isRecording ? 'Recording...': 'Tap to Start recording.')
         ],
       ),
-    );
+    )*/
+      Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12, bottom: 4),
+                child: _isRecording ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+
+                    SizedBox(
+                      width: 160,
+                      child: FlatButton(
+                        padding: const EdgeInsets.all(10),
+                        onPressed: () {
+                          _stopAudioRecording();
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Icon(
+                                Icons.mic,
+                                color: Colors.green,
+                                size: 44,
+                              ),
+                            ),
+                            Text(
+                             _isRecording ? "Recording...\n Tap to stop Recording " : "Tap to start Recording",
+                              style: TextStyle(color:  Colors.black45),
+                            ),
+                          ],
+                        ),
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ) : Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      width: 80,
+                      child: FlatButton(
+                        padding: const EdgeInsets.all(10),
+                        onPressed: () {
+                          setState(() {
+                            _startAudioRecording();
+                            _isRecording = true;
+                          });
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Icon(
+                                Icons.record_voice_over,
+                                color:  Colors.black45,
+                                size: 44,
+                              ),
+                            ),
+                            Text(
+                              "Record",
+                              style: TextStyle(color:  Colors.black45),
+                            ),
+                          ],
+                        ),
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 80,
+                      child: FlatButton(
+                        padding: const EdgeInsets.all(10),
+                        onPressed: () {
+                          _openFileExplorer();
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Icon(
+                                Icons.library_music,
+                                color: Colors.black45,
+                                size: 44,
+                              ),
+                            ),
+                            Text(
+                              "Galery",
+                              style: TextStyle(color:  Colors.black45),
+                            ),
+                          ],
+                        ),
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
   }
 
+  void _openFileExplorer() async {
+    try {
+      FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.audio);
+      if(result != null) {
+        File file = File(result.files.single.path);
+        uploadAudioFile(file);
+      }
+    } on PlatformException catch (e) {
+      print("Unsupported operation" + e.toString());
+    } catch (ex) {
+      print(ex);
+    }
+    if (!mounted) return;
+  }
 
   Future uploadAudioFile(File audio) async {
     Fluttertoast.showToast(msg: 'Please wait.');
