@@ -26,6 +26,7 @@ class AudioRecordingState extends State<AudioRecordingScreen> {
   bool _isRecording = false;
   var dir;
   String audioUrl;
+  bool btnStatus = false;
   Future<bool> checkPermission() async {
     print('Checking permissions.....');
     if (!await Permission.microphone.isGranted) {
@@ -124,7 +125,7 @@ class AudioRecordingState extends State<AudioRecordingScreen> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12, bottom: 4),
-                child: _isRecording ? Row(
+                child: _isRecording || btnStatus ? Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -133,22 +134,29 @@ class AudioRecordingState extends State<AudioRecordingScreen> {
                       width: 160,
                       child: FlatButton(
                         padding: const EdgeInsets.all(10),
-                        onPressed: () {
-                          _stopAudioRecording();
+                        onPressed: (){
+                          if(_isRecording){
+                            setState((){
+                              btnStatus = true;
+                            });
+                             _stopAudioRecording();
+                          }else{
+                            _startAudioRecording();
+                          }
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Padding(
                               padding: const EdgeInsets.only(bottom: 8),
-                              child: Icon(
+                              child: !btnStatus ? Icon(
                                 Icons.mic,
                                 color: Colors.green,
                                 size: 44,
-                              ),
+                              ) : CircularProgressIndicator(),
                             ),
                             Text(
-                             _isRecording ? "Recording...\n Tap to stop Recording " : "Tap to start Recording",
+                             _isRecording || !btnStatus ? "Recording...\nTap to stop." : "Wait...",
                               style: TextStyle(color:  Colors.black45),
                             ),
                           ],
@@ -231,7 +239,12 @@ class AudioRecordingState extends State<AudioRecordingScreen> {
     try {
       FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.audio);
       if(result != null) {
+        print("selected file path is : ${result.files.single.path}");
         File file = File(result.files.single.path);
+        setState(() {
+         // _isRecording = true;
+          btnStatus = true;
+        });
         uploadAudioFile(file);
       }
     } on PlatformException catch (e) {

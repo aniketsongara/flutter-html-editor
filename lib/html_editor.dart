@@ -129,7 +129,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                       widgetIcon(Icons.mic, "", onKlik: () {
                        widget.useBottomSheet
                            ? bottomSheetPickAudio(context)
-                           : bottomSheetPickAudio(context);
+                           : dialogPickAudio(context);
                       }),
                       widgetIcon(Icons.content_copy, "C", onKlik: () async {
                         String data = await getText();
@@ -344,6 +344,31 @@ class HtmlEditorState extends State<HtmlEditor> {
                         "\$('.note-editable').append( '" + base64Image + "');";
                     _controller.evaluateJavascript(txt);
                   }),
+            ),
+          );
+        });
+  }
+  dialogPickAudio(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            content: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              padding: const EdgeInsets.all(12),
+              height: 120,
+              child: AudioRecordingScreen(callbackFile: (url) async {
+                String base64Image = "<p><br></p><p><br></p><audio controls> <source src=\"$url\" type=\"audio/mp3\"></audio><p><br></p><p><br></p>";
+                String txt =
+                    "\$('.note-editable').append( '" + base64Image + "');";
+                _controller.evaluateJavascript(txt);
+              }),
             ),
           );
         });

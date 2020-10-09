@@ -11,11 +11,22 @@ import 'package:image_picker/image_picker.dart';
  */
 
 typedef void CallbackValue(dynamic value);
-class PickVideo extends StatelessWidget {
+class PickVideo extends StatefulWidget {
   final CallbackValue callbackFile;
   final Color color;
-
   PickVideo({this.callbackFile, this.color});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _PickVideoState();
+  }
+}
+
+class _PickVideoState extends State<PickVideo>
+{
+
+
+  bool btnStatus = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +39,7 @@ class PickVideo extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(left: 12, right: 12, bottom: 4),
-              child: Row(
+              child: !btnStatus ? Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -38,7 +49,6 @@ class PickVideo extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       onPressed: () {
                         getImage(true);
-                        Navigator.pop(context);
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -47,13 +57,13 @@ class PickVideo extends StatelessWidget {
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Icon(
                               Icons.linked_camera,
-                              color: color ?? Colors.black45,
+                              color: widget.color ?? Colors.black45,
                               size: 44,
                             ),
                           ),
                           Text(
                             "Camera",
-                            style: TextStyle(color: color ?? Colors.black45),
+                            style: TextStyle(color: widget.color ?? Colors.black45),
                           ),
                         ],
                       ),
@@ -66,7 +76,6 @@ class PickVideo extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       onPressed: () {
                         getImage(false);
-                        Navigator.pop(context);
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -75,13 +84,39 @@ class PickVideo extends StatelessWidget {
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Icon(
                               Icons.image,
-                              color: color ?? Colors.black45,
+                              color: widget.color ?? Colors.black45,
                               size: 44,
                             ),
                           ),
                           Text(
                             "Galery",
-                            style: TextStyle(color: color ?? Colors.black45),
+                            style: TextStyle(color: widget.color ?? Colors.black45),
+                          ),
+                        ],
+                      ),
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ): Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: FlatButton(
+                      padding: const EdgeInsets.all(10),
+                      onPressed: null,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: CircularProgressIndicator(),
+                          ),
+                          Text(
+                            "Wait...",
+                            style: TextStyle(color: widget.color ?? Colors.black45),
                           ),
                         ],
                       ),
@@ -97,12 +132,16 @@ class PickVideo extends StatelessWidget {
     );
   }
 
+
   Future getImage(bool isKamera) async {
     var image = await ImagePicker.pickVideo(
       source: isKamera ? ImageSource.camera : ImageSource.gallery,
     );
 
     if (image != null) {
+      setState(() {
+        btnStatus = true;
+      });
       uploadVideoFile(image);
     }
   }
@@ -122,15 +161,14 @@ class PickVideo extends StatelessWidget {
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       videoUrl = downloadUrl;
       Fluttertoast.showToast(msg: videoUrl);
-      callbackFile(videoUrl);
+      widget.callbackFile(videoUrl);
     }, onError: (err) {
       Fluttertoast.showToast(msg: 'This file is not an video');
     });
-
+    Navigator.pop(context);
   }
+
 }
-
-
 
 /*
                String base64Image = "<video width=\"320\" height=\"240\" controls> <source src=\"$url\" type=\"video/mp4\"></video>";
