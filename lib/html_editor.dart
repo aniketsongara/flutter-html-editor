@@ -126,6 +126,7 @@ class HtmlEditorState extends State<HtmlEditor> {
                             ? bottomSheetPickVideo(context)
                             : dialogPickImage(context);
                       }),
+
                       widgetIcon(Icons.mic, "", onKlik: () {
                        widget.useBottomSheet
                            ? bottomSheetPickAudio(context)
